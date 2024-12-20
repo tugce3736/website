@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haftalık Programım</title>
+    <style>
+        /* Listeyi temizliyoruz */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 8px;
+            background-color: #f0f0f0;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        button:hover {
+            background-color: darkred;
+        }
+
+        /* Paylaşım butonları */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .share-buttons a {
+            text-decoration: none;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: #555;
+        }
+
+        /* Kaydetme butonu */
+        .save-button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background-color: #45a049;
+        }
+
+        /* WhatsApp ve Mail butonları */
+        .share-buttons a:hover {
+            background-color: #ddd;
+        }
+    </style>
+
+    <!-- AdSense kodu burada -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6766085251672483" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <h1>Haftalık Programım</h1>
+
+    <!-- Input ve Buton -->
+    <input type="text" id="todo-input" placeholder="Yeni görev ekleyin">
+    <button id="add-button">Görev Ekle</button>
+
+    <!-- Liste -->
+    <ul id="todo-list"></ul>
+
+    <!-- Kaydetme Butonu -->
+    <button class="save-button" id="download-button">Kaydet</button>
+
+    <!-- Paylaşım Butonları -->
+    <div class="share-buttons">
+        <a href="#" id="whatsapp-share" target="_blank">WhatsApp ile Paylaş</a>
+        <a href="#" id="email-share" target="_blank">E-posta ile Paylaş</a>
+    </div>
+
+    <!-- Footer Reklamı -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-6766085251672483"
+         data-ad-slot="7528616209"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script> 
+
+    <script>
+        // DOM elementlerini seçiyoruz
+        const todoInput = document.getElementById("todo-input");
+        const addButton = document.getElementById("add-button");
+        const todoList = document.getElementById("todo-list");
+        const downloadButton = document.getElementById("download-button");
+        const whatsappShare = document.getElementById("whatsapp-share");
+        const emailShare = document.getElementById("email-share");
+
+        // Sayfa yüklendiğinde, localStorage'dan notları alıp listeyi güncelleyelim
+        window.onload = function () {
+            const savedTodos = JSON.parse(localStorage.getItem("todos"));
+            if (savedTodos) {
+                savedTodos.forEach(todoText => {
+                    const li = document.createElement("li");
+                    li.textContent = todoText;
+
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Delete";
+                    deleteButton.addEventListener("click", function () {
+                        li.remove();
+                        saveTodos();  // Notları kaydet
+                    });
+
+                    li.appendChild(deleteButton);
+                    todoList.appendChild(li);
+                });
+            }
+        };
+
+        // Todo itemlerini eklemek için işlev
+        addButton.addEventListener("click", function () {
+            const todoText = todoInput.value.trim();  // Input'tan gelen metni alıyoruz
+            if (todoText !== "") {
+                const li = document.createElement("li");
+                li.textContent = todoText;
+
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", function () {
+                    li.remove();
+                    saveTodos();  // Notları kaydet
+                });
+
+                li.appendChild(deleteButton);
+                todoList.appendChild(li);
+
+                todoInput.value = "";
+                saveTodos();  // Notları kaydet
+            }
+        });
+
+        // Notları localStorage'a kaydetme
+        function saveTodos() {
+            const todos = [];
+            const items = todoList.querySelectorAll("li");
+            items.forEach(item => {
+                todos.push(item.textContent.replace("Delete", "").trim());
+            });
+            localStorage.setItem("todos", JSON.stringify(todos));  // Verileri localStorage'a kaydediyoruz
+        }
+
+        // Dosya olarak kaydetme fonksiyonu
+        function downloadTodos() {
+            const todos = [];
+            const items = todoList.querySelectorAll("li");
+            items.forEach(item => {
+                todos.push(item.textContent.replace("Delete", "").trim());
+            });
+
+            const todoText = todos.join("\n");  // Her notu yeni satıra yaz
+            const blob = new Blob([todoText], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "notlar.txt";  // İndirilen dosyanın adı
+            link.click();
+        }
+
+        // Kaydetme butonunu tıklayınca notları kaydet
+        downloadButton.addEventListener("click", downloadTodos);
+
+        // WhatsApp Paylaşımı
+        whatsappShare.addEventListener("click", function () {
+            const todos = [];
+            const items = todoList.querySelectorAll("li");
+            items.forEach(item => {
+                todos.push(item.textContent.replace("Delete", "").trim());
+            });
+            const shareText = encodeURIComponent(todos.join("\n"));
+            const whatsappURL = `https://wa.me/?text=${shareText}`;
+            window.open(whatsappURL, '_blank');
+        });
+
+        // E-posta Paylaşımı
+        emailShare.addEventListener("click", function () {
+            const todos = [];
+            const items = todoList.querySelectorAll("li");
+            items.forEach(item => {
+                todos.push(item.textContent.replace("Delete", "").trim());
+            });
+            const subject = "Haftalık Programım";
+            const body = encodeURIComponent(todos.join("\n"));
+            const emailURL = `mailto:?subject=${subject}&body=${body}`;
+            window.location.href = emailURL;
+        });
+    </script>
+</body>
+</html>
